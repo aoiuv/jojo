@@ -1,4 +1,4 @@
-# jojo
+# JOJO
 
 > Convenient command line path shuttle tool
 
@@ -7,7 +7,7 @@ Every searching will locate register file and find the alias key. Each alias key
 ```
 Power by jojo
 Create time: 2021/11/13
-Author: sulirc
+Author: yanguangjie
 ---
 
 @ocean
@@ -18,7 +18,7 @@ Author: sulirc
   /Users/user/Desktop/  
 
 @other_alias_key
-  /path/xxx
+  /path/to/your_target_dir/
 ```
 
 ## Command
