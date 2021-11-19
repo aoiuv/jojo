@@ -1,7 +1,9 @@
 use std::env;
+use std::fs;
 use std::process;
 
-const JO_CFG: &str = "cfg.jo";
+mod define;
+mod warn;
 
 #[derive(Debug)]
 pub struct Config {
@@ -18,45 +20,51 @@ pub enum Action {
     Clean,
 }
 
-fn warn(msg: String) -> String {
-    format!("[JOJO Warning] {}", msg)
-}
-
 fn dispatch(action: &Action, params: &String) {}
+
+fn get_params(action: &String, args: &[String]) -> Result<String, String> {
+    if args.len() < 3 {
+        return Err(warn::error_lack_params(&action));
+    }
+    Ok(args[2].clone())
+}
 
 impl Config {
     pub fn new(args: &[String]) -> Result<Config, String> {
         if args.len() < 2 {
-            return Err("need action".to_string());
+            return Err(warn::error_lack_action());
         }
         let action = args[1].clone();
 
-        if args.len() < 3 {
-            let lack_params = format!("need params of action `{}`", action);
-            return Err(lack_params);
-        }
-        let params = args[2].clone();
-
         match action.as_str() {
-            "register" | "r" => Ok(Config {
-                action: Action::Register,
-                params,
-            }),
-            "unregister" | "R" => Ok(Config {
-                action: Action::UnRegister,
-                params,
-            }),
+            "register" | "r" => {
+                let params = get_params(&action, args)?;
+                Ok(Config {
+                    action: Action::Register,
+                    params,
+                })
+            }
+            "unregister" | "R" => {
+                let params = get_params(&action, args)?;
+                Ok(Config {
+                    action: Action::UnRegister,
+                    params,
+                })
+            }
+            "expand" | "e" => {
+                let params = get_params(&action, args)?;
+                Ok(Config {
+                    action: Action::Expand,
+                    params,
+                })
+            }
             "list" | "l" => Ok(Config {
                 action: Action::List,
-                params,
-            }),
-            "expand" | "e" => Ok(Config {
-                action: Action::Expand,
-                params,
+                params: String::from(""),
             }),
             "clean" => Ok(Config {
                 action: Action::Clean,
-                params,
+                params: String::from(""),
             }),
             _ => Err(format!("invalid action `{}`", action)),
         }
@@ -67,10 +75,13 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let cfg = Config::new(&args).unwrap_or_else(|err| {
-        println!("{}", warn(err));
+        println!("{}", warn::warn_prefix(err));
         process::exit(1);
     });
-    // dispatch action and it's params
+
+    let footprint = fs::read(define::JO_CFG);
+
+    println!("Cfg file: {:?}", footprint);
     dispatch(&cfg.action, &cfg.params);
 
     println!("Config: {:?}", cfg);
