@@ -16,6 +16,10 @@ pub fn error_lack_cfg() -> String {
   "config file `cfg.jo` not exist".to_string()
 }
 
+pub fn error_no_register(key: &str) -> String {
+  format!("alias `{}` not register", key)
+}
+
 pub fn error_invalid_action(action: &String) -> String {
   format!("invalid action `{}`", action)
 }

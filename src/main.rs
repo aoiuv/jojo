@@ -1,7 +1,6 @@
-
+use std::collections::HashMap;
 use std::env;
 use std::process;
-
 
 mod jo;
 mod warn;
@@ -21,7 +20,25 @@ pub enum Action {
     Clean,
 }
 
-fn dispatch(action: &Action, params: &String) {}
+fn dispatch(ctx: HashMap<String, String>, action: &Action, params: &String) {
+    match action {
+        Action::Register => {}
+        Action::UnRegister => {}
+        Action::List => {
+            for (k, v) in ctx.iter() {
+                println!("{:<10} => {:<2}", k, v);
+            }
+        }
+        Action::Expand => {
+            let result = ctx.get(params);
+            match result {
+                Some(v) => print!("{}", v),
+                None => println!("{}", warn::warn_prefix(warn::error_no_register(params))),
+            }
+        }
+        Action::Clean => {}
+    }
+}
 
 fn get_params(action: &String, args: &[String]) -> Result<String, String> {
     if args.len() < 3 {
@@ -79,10 +96,10 @@ fn main() {
         println!("{}", warn::warn_prefix(err));
         process::exit(1);
     });
-    let hashmap = jo::parse();
+    let ctx = jo::parse();
 
-    println!("Hashmap: {:?}", hashmap);
-    dispatch(&cfg.action, &cfg.params);
+    // println!("Context: {:?}", ctx);
+    dispatch(ctx, &cfg.action, &cfg.params);
 
-    println!("Config: {:?}", cfg);
+    // println!("Config: {:?}", cfg);
 }
