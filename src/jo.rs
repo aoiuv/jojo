@@ -10,12 +10,12 @@ mod define;
 #[path = "warn.rs"]
 mod warn;
 
-use define::{JO_CFG, SEP_BREAK, SEP_SEGMENT, SEP_UNIT};
+use define::{get_sys_install_path, SEP_BREAK, SEP_SEGMENT, SEP_UNIT};
 
 pub type Context = HashMap<String, String>;
 
 fn get_cfg_path() -> PathBuf {
-  PathBuf::from(JO_CFG)
+  PathBuf::from(get_sys_install_path())
 }
 
 // parse cfg file to hashmap
@@ -81,7 +81,7 @@ pub fn serialize(ctx: &Context) {
     cfg_text.push_str(SEP_SEGMENT);
   }
 
-  if let Err(err) = fs::write(JO_CFG, cfg_text.trim_end()) {
+  if let Err(err) = fs::write(get_cfg_path(), cfg_text.trim_end()) {
     println!(
       "{}",
       warn::warn_prefix(warn::error_failed_to_update_cfg(err.to_string()))
