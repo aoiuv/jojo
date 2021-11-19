@@ -1,8 +1,9 @@
+
 use std::env;
-use std::fs;
 use std::process;
 
-mod define;
+
+mod jo;
 mod warn;
 
 #[derive(Debug)]
@@ -66,7 +67,7 @@ impl Config {
                 action: Action::Clean,
                 params: String::from(""),
             }),
-            _ => Err(format!("invalid action `{}`", action)),
+            _ => Err(warn::error_invalid_action(&action)),
         }
     }
 }
@@ -78,10 +79,9 @@ fn main() {
         println!("{}", warn::warn_prefix(err));
         process::exit(1);
     });
+    let hashmap = jo::parse();
 
-    let footprint = fs::read(define::JO_CFG);
-
-    println!("Cfg file: {:?}", footprint);
+    println!("Hashmap: {:?}", hashmap);
     dispatch(&cfg.action, &cfg.params);
 
     println!("Config: {:?}", cfg);
