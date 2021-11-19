@@ -1,13 +1,12 @@
 use std::env;
 use std::process;
-use std::error;
 
 const JO_CFG: &str = "cfg.jo";
 
 #[derive(Debug)]
 pub struct Config {
     pub action: Action,
-    pub param: String,
+    pub params: String,
 }
 
 #[derive(Debug)]
@@ -19,39 +18,45 @@ pub enum Action {
     Clean,
 }
 
-fn dispatch(action: Action) {}
+fn warn(msg: String) -> String {
+    format!("[JOJO Warning] {}", msg)
+}
+
+fn dispatch(action: &Action, params: &String) {}
 
 impl Config {
     pub fn new(args: &[String]) -> Result<Config, String> {
         if args.len() < 2 {
-            return Err("need jo action".to_string());
+            return Err("need action".to_string());
         }
         let action = args[1].clone();
+
         if args.len() < 3 {
-            return Err("need jo param of action".to_string());
+            let lack_params = format!("need params of action `{}`", action);
+            return Err(lack_params);
         }
-        let param = args[2].clone();
+        let params = args[2].clone();
 
         match action.as_str() {
             "register" | "r" => Ok(Config {
                 action: Action::Register,
-                param,
+                params,
             }),
             "unregister" | "R" => Ok(Config {
                 action: Action::UnRegister,
-                param,
+                params,
             }),
             "list" | "l" => Ok(Config {
                 action: Action::List,
-                param,
+                params,
             }),
             "expand" | "e" => Ok(Config {
                 action: Action::Expand,
-                param,
+                params,
             }),
             "clean" => Ok(Config {
                 action: Action::Clean,
-                param,
+                params,
             }),
             _ => Err(format!("invalid action `{}`", action)),
         }
@@ -62,9 +67,11 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let cfg = Config::new(&args).unwrap_or_else(|err| {
-        println!("[JOJO Error] {}", err);
+        println!("{}", warn(err));
         process::exit(1);
     });
+    // dispatch action and it's params
+    dispatch(&cfg.action, &cfg.params);
 
     println!("Config: {:?}", cfg);
 }
