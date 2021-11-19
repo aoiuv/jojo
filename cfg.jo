@@ -1,8 +1,11 @@
+@rock
+/Users/sulirc/spaceship/workspace/rock_proj
+
 @npm
 /Users/sulirc/.nvm/versions/node/v14.16.1/bin/npm
 
-@desk:@des:@d
-/Users/sulirc/Desktop
+@jo
+/Users/sulirc/Desktop/jojo
 
-@rock
-/Users/sulirc/spaceship/workspace/rock_proj
+@d:@desk:@des
+/Users/sulirc/Desktop

@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use std::path::{Path};
+use std::fs;
 
 #[path = "cfg.rs"]
 mod cfg;
@@ -16,7 +18,10 @@ pub fn dispatch(ctx: &mut jo::Context, action: &Action, params: &TKeyTarget) {
       let k = _k.as_ref().unwrap();
       let v = _v.as_ref().unwrap();
 
-      jo::update(ctx, k.to_string(), v.to_string());
+      let path = Path::new(v);
+      let abs_path = fs::canonicalize(path).unwrap();
+
+      jo::update(ctx, k.to_string(), String::from(abs_path.to_string_lossy()));
       jo::serialize(ctx);
     }
     Action::UnRegister => {
