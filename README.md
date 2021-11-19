@@ -1,9 +1,8 @@
 # JOJO
 
 > Convenient command line path shuttle tool
-> Created by Suri Y.
 
-## Design
+## Design Goal
 Every searching will locate register file and find the alias key. Each alias key must begin with symbol `@`. One path may have multiple alias key. Data will be saved in a file which exist in system root path. 
 ```
 @npm
