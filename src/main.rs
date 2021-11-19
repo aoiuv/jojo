@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::env;
 use std::process;
 
@@ -30,16 +29,29 @@ fn dispatch(ctx: &mut jo::Context, action: &Action, params: &TKeyTarget) {
             let v = _v.as_ref().unwrap();
 
             jo::update(ctx, k.to_string(), v.to_string());
+            jo::serialize(ctx);
+
+            println!("Updated context: {:?}", ctx);
         }
-        Action::UnRegister => {}
+        Action::UnRegister => {
+            let [_k, _] = &params.as_ref().unwrap();
+            let k = _k.as_ref().unwrap();
+
+            jo::erase(ctx, &k);
+            jo::serialize(ctx);
+        }
+        Action::Clean => {
+            jo::erase_all(ctx);
+            jo::serialize(ctx);
+        }
         Action::List => {
             for (k, v) in ctx.iter() {
                 println!("{:<10} => {:<2}", k, v);
             }
         }
         Action::Expand => {
-            let _params = &params.as_ref().unwrap();
-            let k = _params[0].as_ref().unwrap();
+            let [_k, _] = &params.as_ref().unwrap();
+            let k = _k.as_ref().unwrap();
             let result = ctx.get(k);
 
             match result {
@@ -47,7 +59,6 @@ fn dispatch(ctx: &mut jo::Context, action: &Action, params: &TKeyTarget) {
                 None => println!("{}", warn::warn_prefix(warn::error_no_register(&k))),
             }
         }
-        Action::Clean => {}
     }
 }
 
@@ -68,6 +79,9 @@ impl Config {
         match action.as_str() {
             "register" | "r" => {
                 let args = get_params(&action, args)?;
+                if args.len() < 2 {
+                    return Err(warn::error_lack_params(&action));
+                }
                 let k = &args[0];
                 let v = &args[1];
 

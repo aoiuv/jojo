@@ -16,6 +16,10 @@ pub fn error_lack_cfg() -> String {
   "config file `cfg.jo` not exist".to_string()
 }
 
+pub fn error_failed_to_update_cfg(err: String) -> String {
+  format!("failed to update config file `cfg.jo` due to: {}", err)
+}
+
 pub fn error_no_register(key: &String) -> String {
   format!("alias `{}` not register", key)
 }
