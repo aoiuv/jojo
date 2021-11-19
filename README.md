@@ -18,14 +18,14 @@ Every searching will locate register file and find the alias key. Each alias key
 ## Command
 
 ### jojo jump
-Use our lovely jojo to jump target path by alias:
+ jump target path by alias:
 ```bash
 jojo-jump @desk
 # or short command
 j @desk
 ```
 
-In essence: The Rust program can only affect its own environment, not your shell. Therefore we need to implement command by wrapping jojo expand in bash function:
+In essence: The rust program can only affect its own environment, not your shell. Therefore we need to implement command by wrapping `jojo expand` in bash function:
 
 ```bash
 jojo_jump() {
