@@ -5,10 +5,12 @@ use std::process;
 mod jo;
 mod warn;
 
+type TKeyTarget = Option<[Option<String>; 2]>;
+
 #[derive(Debug)]
 pub struct Config {
     pub action: Action,
-    pub params: String,
+    pub params: TKeyTarget,
 }
 
 #[derive(Debug)]
@@ -20,9 +22,15 @@ pub enum Action {
     Clean,
 }
 
-fn dispatch(ctx: HashMap<String, String>, action: &Action, params: &String) {
+fn dispatch(ctx: &mut jo::Context, action: &Action, params: &TKeyTarget) {
     match action {
-        Action::Register => {}
+        Action::Register => {
+            let [_k, _v] = &params.as_ref().unwrap();
+            let k = _k.as_ref().unwrap();
+            let v = _v.as_ref().unwrap();
+
+            jo::update(ctx, k.to_string(), v.to_string());
+        }
         Action::UnRegister => {}
         Action::List => {
             for (k, v) in ctx.iter() {
@@ -30,21 +38,24 @@ fn dispatch(ctx: HashMap<String, String>, action: &Action, params: &String) {
             }
         }
         Action::Expand => {
-            let result = ctx.get(params);
+            let _params = &params.as_ref().unwrap();
+            let k = _params[0].as_ref().unwrap();
+            let result = ctx.get(k);
+
             match result {
                 Some(v) => print!("{}", v),
-                None => println!("{}", warn::warn_prefix(warn::error_no_register(params))),
+                None => println!("{}", warn::warn_prefix(warn::error_no_register(&k))),
             }
         }
         Action::Clean => {}
     }
 }
 
-fn get_params(action: &String, args: &[String]) -> Result<String, String> {
+fn get_params<'a>(action: &String, args: &'a [String]) -> Result<&'a [String], String> {
     if args.len() < 3 {
         return Err(warn::error_lack_params(&action));
     }
-    Ok(args[2].clone())
+    Ok(&args[2..])
 }
 
 impl Config {
@@ -56,33 +67,40 @@ impl Config {
 
         match action.as_str() {
             "register" | "r" => {
-                let params = get_params(&action, args)?;
+                let args = get_params(&action, args)?;
+                let k = &args[0];
+                let v = &args[1];
+
                 Ok(Config {
                     action: Action::Register,
-                    params,
+                    params: Some([Some(k.to_string()), Some(v.to_string())]),
                 })
             }
             "unregister" | "R" => {
-                let params = get_params(&action, args)?;
+                let args = get_params(&action, args)?;
+                let k = &args[0];
+
                 Ok(Config {
                     action: Action::UnRegister,
-                    params,
+                    params: Some([Some(k.to_string()), None]),
                 })
             }
             "expand" | "e" => {
-                let params = get_params(&action, args)?;
+                let args = get_params(&action, args)?;
+                let k = &args[0];
+
                 Ok(Config {
                     action: Action::Expand,
-                    params,
+                    params: Some([Some(k.to_string()), None]),
                 })
             }
             "list" | "l" => Ok(Config {
                 action: Action::List,
-                params: String::from(""),
+                params: None,
             }),
             "clean" => Ok(Config {
                 action: Action::Clean,
-                params: String::from(""),
+                params: None,
             }),
             _ => Err(warn::error_invalid_action(&action)),
         }
@@ -96,10 +114,7 @@ fn main() {
         println!("{}", warn::warn_prefix(err));
         process::exit(1);
     });
-    let ctx = jo::parse();
+    let mut ctx = jo::parse();
 
-    // println!("Context: {:?}", ctx);
-    dispatch(ctx, &cfg.action, &cfg.params);
-
-    // println!("Config: {:?}", cfg);
+    dispatch(&mut ctx, &cfg.action, &cfg.params);
 }

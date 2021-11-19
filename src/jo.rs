@@ -7,29 +7,43 @@ mod define;
 #[path = "warn.rs"]
 mod warn;
 
-use define::{JO_CFG, PROTOCOL_BREAK, PROTOCOL_NEW_SEGMENT, PROTOCOL_SEP_ALIAS};
+use define::{JO_CFG, SEP_BREAK, SEP_SEGMENT, SEP_ALIAS};
 
-pub fn parse() -> HashMap<String, String> {
+pub type Context = HashMap<String, String>;
+
+// parse cfg file to hashmap
+pub fn parse() -> Context {
   let mut hashmap = HashMap::new();
+
   let footprint = fs::read_to_string(JO_CFG).unwrap_or_else(|_| {
     println!("{}", warn::warn_prefix(warn::error_lack_cfg()));
     process::exit(1);
   });
 
-  let segments: Vec<&str> = footprint.split(PROTOCOL_NEW_SEGMENT).collect();
+  let segs: Vec<&str> = footprint.split(SEP_SEGMENT).collect();
 
-  for segment in segments {
-    if segment.len() == 0 {
+  for s in segs {
+    if s.len() == 0 {
       continue;
     }
-    let parts: Vec<&str> = segment.split(PROTOCOL_BREAK).collect();
-    let alias: Vec<&str> = parts[0].split(PROTOCOL_SEP_ALIAS).collect();
+    let parts: Vec<&str> = s.split(SEP_BREAK).collect();
+    let keys: Vec<&str> = parts[0].split(SEP_ALIAS).collect();
     let target = parts[1];
 
-    for a in alias {
-      hashmap.insert(a.to_string(), target.to_string());
+    for k in keys {
+      hashmap.insert(k.to_string(), target.to_string());
     }
   }
 
   hashmap
 }
+
+// update cfg
+pub fn update(ctx: &mut Context, key: String, val: String) {
+  ctx.insert(key, val);
+}
+
+pub fn serialize(ctx: Context) {
+
+}
+// pub fn erase() -> Result<Context, String> {}
