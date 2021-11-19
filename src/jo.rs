@@ -15,9 +15,7 @@ use define::{JO_CFG, SEP_BREAK, SEP_SEGMENT, SEP_UNIT};
 pub type Context = HashMap<String, String>;
 
 fn get_cfg_path() -> PathBuf {
-  let cur = Path::new("./");
-  let cfg_path = Path::new(JO_CFG);
-  cur.join(cfg_path)
+  PathBuf::from(JO_CFG)
 }
 
 // parse cfg file to hashmap
