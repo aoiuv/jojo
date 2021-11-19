@@ -1,5 +1,8 @@
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::fs;
+use std::path::{Path, PathBuf};
 use std::process;
 
 #[path = "define.rs"]
@@ -11,11 +14,18 @@ use define::{JO_CFG, SEP_BREAK, SEP_SEGMENT, SEP_UNIT};
 
 pub type Context = HashMap<String, String>;
 
+fn get_cfg_path() -> PathBuf {
+  let cur = Path::new("./");
+  let cfg_path = Path::new(JO_CFG);
+  cur.join(cfg_path)
+}
+
 // parse cfg file to hashmap
 pub fn parse() -> Context {
   let mut hashmap = HashMap::new();
+  let cfg_path = get_cfg_path();
 
-  let footprint = fs::read_to_string(JO_CFG).unwrap_or_else(|_| {
+  let footprint = fs::read_to_string(cfg_path).unwrap_or_else(|_| {
     println!("{}", warn::warn_prefix(warn::error_lack_cfg()));
     process::exit(1);
   });
@@ -70,7 +80,10 @@ pub fn serialize(ctx: &Context) {
   }
 
   if let Err(err) = fs::write(JO_CFG, cfg_text.trim_end()) {
-    println!("{}", warn::warn_prefix(warn::error_failed_to_update_cfg(err.to_string())));
+    println!(
+      "{}",
+      warn::warn_prefix(warn::error_failed_to_update_cfg(err.to_string()))
+    );
     process::exit(1);
   }
 }

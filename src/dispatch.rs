@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[path = "cfg.rs"]
 mod cfg;
 #[path = "jo.rs"]

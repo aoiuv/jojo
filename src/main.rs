@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::env;
 use std::process;
 
@@ -5,6 +7,7 @@ mod cfg;
 mod dispatch;
 mod jo;
 mod warn;
+mod define;
 
 use dispatch::*;
 

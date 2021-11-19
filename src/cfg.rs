@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[path = "warn.rs"]
 mod warn;
 
