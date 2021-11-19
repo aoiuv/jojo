@@ -25,7 +25,11 @@ pub fn parse() -> Context {
   let mut hashmap = HashMap::new();
   let cfg_path = get_cfg_path();
 
-  let footprint = fs::read_to_string(cfg_path).unwrap_or_else(|_| {
+  if !cfg_path.exists() {
+    fs::File::create(&cfg_path).unwrap();
+  }
+
+  let footprint = fs::read_to_string(&cfg_path).unwrap_or_else(|_| {
     println!("{}", warn::warn_prefix(warn::error_lack_cfg()));
     process::exit(1);
   });

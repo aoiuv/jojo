@@ -6,20 +6,14 @@
 ## Design
 Every searching will locate register file and find the alias key. Each alias key must begin with symbol `@`. One path may have multiple alias key. Data will be saved in a file which exist in system root path. 
 ```
-Power by jojo
-Create time: 2021/11/13
-Author: yanguangjie
----
+@npm
+/Users/sulirc/.nvm/versions/node/v14.16.1/bin/npm
 
-@ocean
-  /Users/user/Desktop/workspace/ocean
+@desk:@des:@d
+/Users/sulirc/Desktop
 
-@des
-@desk
-  /Users/user/Desktop/  
-
-@other_alias_key
-  /path/to/your_target_dir/
+@rock
+/Users/sulirc/spaceship/workspace/rock_proj
 ```
 
 ## Command
